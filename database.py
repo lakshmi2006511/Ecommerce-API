@@ -1,19 +1,23 @@
 import os
-<<<<<<< HEAD
-# print(os.getenv())
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from dotenv import load_dotenv
 
+# Load environment variables for local testing
 load_dotenv()
 
-DATABASE_URL = os.environ.get("DB_URL")
+# Get the database URL from Render Environment Variables
+# If running locally and DB_URL is missing, it falls back to your local MySQL database
+DATABASE_URL = os.environ.get(
+    "DATABASE_URL", 
+    os.environ.get("DB_URL", "mysql+pymysql://root:30890349@localhost:3306/ecommerce_db")
+)
 
 if not DATABASE_URL:
-    raise RuntimeError("DATABASE_URL environment variable is not set.")
+    raise RuntimeError("Database connection string is not set.")
 
-DATABASE_URL = os.getenv("DARABASE_URL","mysql+pymysql://root:30890349@localhost:3306/ecommerce_db")
-engine = create_engine(DATABASE_URL)
+# Create the engine with pool_pre_ping to prevent disconnected connection errors on production
+engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 
 SessionLocal = sessionmaker(
     autocommit=False,
@@ -21,17 +25,6 @@ SessionLocal = sessionmaker(
     bind=engine
 )
 
+# Provides a base class for models of SQL tables
 Base = declarative_base()
-# provides a base class for models of sql tables
-=======
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
 
-# Render dashboard లో Environment Variable గా DATABASE_URL పెట్టు
-DATABASE_URL = os.environ["DATABASE_URL"]
-
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
->>>>>>> 2aa0b8584ef1fa5e45c5d8263920750f1cda6d4
